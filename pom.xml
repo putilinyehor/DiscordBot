@@ -33,6 +33,13 @@
             <artifactId>snakeyaml</artifactId>
             <version>2.0</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-youtube</artifactId>
+            <version>v3-rev20230521-2.0.0</version>
+        </dependency>
+
     </dependencies>
 
 </project>

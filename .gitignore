@@ -12,4 +12,5 @@ target/
 *.iml
 *.ipr
 
-/src/main/java/org/example/configuration/config.yml
+/src/main/java/org/example/configuration/
+/src/main/java/org/example/youtubeapi/credentials

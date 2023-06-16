@@ -25,10 +25,10 @@ import java.util.Map;
 
 public class Bot {
     private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
-
     private static String defaultChannelId = "";
     private static String token = "";
     private static JDA jda = null;
+
     public Bot() {
         try {
             loadConfig();
@@ -93,13 +93,10 @@ public class Bot {
     private static void configureMemoryUsage(JDABuilder builder) {
         // Disable cache for member activities (streaming/games/spotify)
         builder.disableCache(CacheFlag.ACTIVITY);
-
         // Only cache members who are either in a voice channel or owner of the guild
         builder.setMemberCachePolicy(MemberCachePolicy.VOICE.or(MemberCachePolicy.OWNER));
-
         // Disable member chunking on startup
         builder.setChunkingFilter(ChunkingFilter.NONE);
-
         // Consider guilds with more than 50 members as "large".
         // Large guilds will only provide online members in their setup and thus reduce bandwidth if chunking is disabled.
         builder.setLargeThreshold(50);
