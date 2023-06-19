@@ -11,7 +11,7 @@ public class RemoveDefaultChannel extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         if (event.getName().equalsIgnoreCase("removechannel")) {
             try {
-                Bot.saveDefaultChannelNameInConfig("none");
+                Bot.saveConfig("none");
             } catch (FileNotFoundException e) {
                 System.out.println("Config file does not exist");
                 event.reply("Config file does not exist").setEphemeral(false).queue();

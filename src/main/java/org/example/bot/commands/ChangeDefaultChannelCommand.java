@@ -14,7 +14,7 @@ public class ChangeDefaultChannelCommand extends ListenerAdapter {
             String channelID = Objects.requireNonNull(event.getOption("channel")).getAsChannel().getId();
             String channelName = Objects.requireNonNull(event.getOption("channel")).getAsChannel().getName();
             try {
-                Bot.saveDefaultChannelNameInConfig(channelID);
+                Bot.saveConfig(channelID);
             } catch (FileNotFoundException e) {
                 System.out.println("Config file does not exist");
                 event.reply("Config file does not exist").setEphemeral(false).queue();

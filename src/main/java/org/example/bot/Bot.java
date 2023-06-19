@@ -17,6 +17,7 @@ import org.example.bot.commands.RemoveDefaultChannel;
 import org.example.bot.handler.Responses;
 import org.example.bot.listeners.LoginListener;
 import org.example.bot.listeners.MessageListener;
+import org.example.youtubeapi.YoutubeAPI;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
@@ -24,21 +25,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Bot {
+    private static final String keysFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\keys.yml";
     private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
     private static String defaultChannelId = "";
     private static String token = "";
+    private static YoutubeAPI youtube = null;
     private static JDA jda = null;
 
     public Bot() {
         try {
-            loadConfig();
+            loadInitialConfiguration();
         } catch (FileNotFoundException e) {
             System.out.println("Config file does not exist");
             System.exit(-1);
         }
     }
 
-    public void run_bot() {
+    public void runBot() {
         JDABuilder builder = JDABuilder.createDefault(token);
 
         configureBasicSettings(builder);
@@ -54,27 +57,47 @@ public class Bot {
         return jda;
     }
 
+    public static YoutubeAPI getYoutube() {
+        return youtube;
+    }
+
     public static String getDefaultChannelId() {
         return defaultChannelId;
     }
 
-    private static void loadConfig() throws FileNotFoundException {
-        InputStream inputStream = new FileInputStream(new File(configFilePath));
-
+    private static void loadInitialConfiguration() throws FileNotFoundException {
+        InputStream inputStream = null;
         Yaml yaml = new Yaml();
-        Map<String, String> data = yaml.load(inputStream);
+        Map<String, String> data;
+
+        inputStream = new FileInputStream(keysFilePath);
+        data = yaml.load(inputStream);
         token = data.get("token");
+        String apiKey = data.get("api-key");
+
+        inputStream = new FileInputStream(configFilePath);
+        data = yaml.load(inputStream);
         defaultChannelId = data.get("default-channel-id");
+
+        initialiseYoutubeInstance(apiKey);
     }
 
-    public static void saveDefaultChannelNameInConfig(String id) throws FileNotFoundException {
+    private static void initialiseYoutubeInstance(String apiKey) {
+        try {
+            youtube = new YoutubeAPI(apiKey);
+        } catch (IOException e) {
+            System.out.println("Cannot connect to Youtube Search database. Search functions are not available. Exiting the program...");
+            System.exit(-2);
+        }
+    }
+
+    public static void saveConfig(String id) throws FileNotFoundException {
         defaultChannelId = id;
 
         Map<String, String> data = new HashMap<>();
-        data.put("token", token);
         data.put("default-channel-id", defaultChannelId);
 
-        PrintWriter writer = new PrintWriter(new File(configFilePath));
+        PrintWriter writer = new PrintWriter(configFilePath);
         Yaml yaml = new Yaml();
         yaml.dump(data, writer);
     }
