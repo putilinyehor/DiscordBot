@@ -25,13 +25,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Bot {
+    // Path to "keys.yml" configuration file
     private static final String keysFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\keys.yml";
+    // Path to "config.yml" configuration file
     private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
     private static String defaultChannelId = "";
+    // Discord bot token that is stored in "keys.yml"
     private static String token = "";
+    // YouTube's authorization token, to access video database. Google Cloud > YouTube Data v3 API
     private static YoutubeAPI youtube = null;
+    // JDA instance
     private static JDA jda = null;
 
+    /**
+     * Constructor
+     */
     public Bot() {
         try {
             loadInitialConfiguration();
@@ -41,6 +49,9 @@ public class Bot {
         }
     }
 
+    /**
+     * Runs discord bot (1initialize JDA)
+     */
     public void runBot() {
         JDABuilder builder = JDABuilder.createDefault(token);
 
@@ -65,6 +76,10 @@ public class Bot {
         return defaultChannelId;
     }
 
+    /**
+     * Loads configuration and keys from files
+     * @throws FileNotFoundException if config file does not exist
+     */
     private static void loadInitialConfiguration() throws FileNotFoundException {
         InputStream inputStream = null;
         Yaml yaml = new Yaml();
@@ -82,6 +97,10 @@ public class Bot {
         initialiseYoutubeInstance(apiKey);
     }
 
+    /**
+     * Initializes YouTube instance to work with a video database
+     * @param apiKey String, API key from Google Cloud Auth
+     */
     private static void initialiseYoutubeInstance(String apiKey) {
         try {
             youtube = new YoutubeAPI(apiKey);
@@ -91,6 +110,11 @@ public class Bot {
         }
     }
 
+    /**
+     * Saves configuration file
+     * @param id String, id that needs to be saved
+     * @throws FileNotFoundException if config file does not exist
+     */
     public static void saveConfig(String id) throws FileNotFoundException {
         defaultChannelId = id;
 
@@ -102,6 +126,10 @@ public class Bot {
         yaml.dump(data, writer);
     }
 
+    /**
+     * Configures basic bot settings
+     * @param builder JDABuilder, builder instance
+     */
     private static void configureBasicSettings(JDABuilder builder) {
         // Enable intents to access message content
         builder.enableIntents(GatewayIntent.MESSAGE_CONTENT);
@@ -113,6 +141,10 @@ public class Bot {
         builder.setActivity(Activity.watching("after you from under your bed"));
     }
 
+    /**
+     * Configures memory usage of a bot to get better performance
+     * @param builder JDABuilder, builder instance
+     */
     private static void configureMemoryUsage(JDABuilder builder) {
         // Disable cache for member activities (streaming/games/spotify)
         builder.disableCache(CacheFlag.ACTIVITY);
@@ -125,6 +157,10 @@ public class Bot {
         builder.setLargeThreshold(50);
     }
 
+    /**
+     * Registers listeners bot uses
+     * @param builder JDABuilder, builder instance
+     */
     private static void registerListeners(JDABuilder builder) {
         // Listeners
         builder.addEventListeners(new LoginListener());
@@ -136,6 +172,9 @@ public class Bot {
         builder.addEventListeners(new HelpCommand());
     }
 
+    /**
+     * Registers commands bot provides
+     */
     private static void registerCommands() {
         jda.updateCommands().addCommands(
                 Commands.slash("changechannel", "Change a channel, where the BOT is operating.").
@@ -145,6 +184,11 @@ public class Bot {
         ).queue();
     }
 
+    /**
+     * Sends message to a discord channel
+     * @param message Message, message content instance
+     * @param content String, str message
+     */
     public static void sendMessage(Message message, String content) {
         int contentLength = content.length();
 

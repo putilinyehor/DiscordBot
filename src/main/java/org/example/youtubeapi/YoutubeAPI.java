@@ -20,6 +20,11 @@ public class YoutubeAPI {
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
     private static YouTube youtube;
 
+    /**
+     * Constructor, initializes a YouTube instance
+     * @param apiKey String, YouTube Data V3 Api Key
+     * @throws IOException if there was an error, creating YouTube instance
+     */
     public YoutubeAPI(String apiKey) throws IOException {
         this.apiKey = apiKey;
         youtube = new YouTube.Builder(YoutubeAPI.HTTP_TRANSPORT, YoutubeAPI.JSON_FACTORY, request -> {
@@ -98,17 +103,22 @@ public class YoutubeAPI {
         return videoItemsArray;
     }
 
+    /**
+     * Creates a string containing a list of items to show to user
+     * @param videos String[][], array with search result items
+     * @return String, list of YouTube items to display
+     */
     public static String getSearchResultAsString(String[][] videos) {
-        StringBuilder results = new StringBuilder("Search results: \n");
+        StringBuilder str = new StringBuilder("Search results: \n");
 
         for (int i = 0; i < videos.length; i++) {
-            results.append(i + 1)
+            str.append(i + 1)
                     .append(": ")
                     .append(videos[i][0])
                     .append("\n");
         }
 
-        return results.toString();
+        return str.toString();
     }
 
     /*
@@ -121,9 +131,16 @@ public class YoutubeAPI {
     search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url,snippet/description)");
      */
 
+    /**
+     * Creates a full YouTube link from id
+     * @param id String, id of a YouTube video
+     * @return String, final link
+     */
     private static String getYoutubeLink(String id) {
         return "https://www.youtube.com/watch?v=" + id;
     }
+
+
     // TODO:
     //  1. Integrate YoutubeApi into bot to search videos,
     //  4. Test non-required options
