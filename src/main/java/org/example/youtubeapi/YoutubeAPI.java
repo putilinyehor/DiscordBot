@@ -102,6 +102,15 @@ public class YoutubeAPI {
         }
         return videoItemsArray;
     }
+    /*
+    To get a thumbnail:
+    Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
+    System.out.println(" Thumbnail: " + thumbnail.getUrl());
+    To get a description:
+    System.out.println(" Desc: " + singleVideo.getSnippet().getDescription());
+    + add
+    search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url,snippet/description)");
+     */
 
     /**
      * Creates a string containing a list of items to show to user
@@ -120,16 +129,6 @@ public class YoutubeAPI {
 
         return str.toString();
     }
-
-    /*
-    To get a thumbnail:
-    Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
-    System.out.println(" Thumbnail: " + thumbnail.getUrl());
-    To get a description:
-    System.out.println(" Desc: " + singleVideo.getSnippet().getDescription());
-    + add
-    search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url,snippet/description)");
-     */
 
     /**
      * Creates a full YouTube link from id

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.example.bot.commands.ChangeDefaultChannelCommand;
 import org.example.bot.commands.HelpCommand;
 import org.example.bot.commands.RemoveDefaultChannel;
+import org.example.bot.commands.SearchYoutubeCommand;
 import org.example.bot.handler.Responses;
 import org.example.bot.listeners.LoginListener;
 import org.example.bot.listeners.MessageListener;
@@ -167,9 +168,10 @@ public class Bot {
         builder.addEventListeners(new MessageListener());
 
         // Slash Commands
+        builder.addEventListeners(new HelpCommand());
         builder.addEventListeners(new ChangeDefaultChannelCommand());
         builder.addEventListeners(new RemoveDefaultChannel());
-        builder.addEventListeners(new HelpCommand());
+        builder.addEventListeners(new SearchYoutubeCommand());
     }
 
     /**
@@ -177,10 +179,13 @@ public class Bot {
      */
     private static void registerCommands() {
         jda.updateCommands().addCommands(
+                Commands.slash("help", "List of all commands available, with / and !!"),
                 Commands.slash("changechannel", "Change a channel, where the BOT is operating.").
                         addOption(OptionType.CHANNEL, "channel", "The new channel to operate in", true),
                 Commands.slash("removechannel", "Remove the default channel to use the BOT everywhere."),
-                Commands.slash("help", "List of all commands available, with / and !!")
+                Commands.slash("youtube", "Search for a youtube video")
+                        .addOption(OptionType.STRING, "search", "What you want to search for", true)
+                        .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false)
         ).queue();
     }
 
@@ -190,14 +195,15 @@ public class Bot {
      * @param content String, str message
      */
     public static void sendMessage(Message message, String content) {
-        int contentLength = content.length();
+        if (content.length() < 2 || !content.substring(0, 2).equalsIgnoreCase("!!"))
+            return;
 
-        if (contentLength > 2 && content.substring(0, 2).equalsIgnoreCase("!!")) {
-            String responseMessage = Responses.handleResponse(message, content.substring(2, contentLength));
-            if (!responseMessage.equalsIgnoreCase("")) {
-                MessageChannel channel = message.getChannel();
-                channel.sendMessage(responseMessage).queue();
-            }
+        String responseMessage = Responses.handleResponse(message, content.substring(2));
+        if (responseMessage.equalsIgnoreCase("")) {
+            return;
         }
+
+        MessageChannel channel = message.getChannel();
+        channel.sendMessage(responseMessage).queue();
     }
 }
