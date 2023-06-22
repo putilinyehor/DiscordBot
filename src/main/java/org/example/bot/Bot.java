@@ -11,10 +11,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.example.bot.commands.ChangeDefaultChannelCommand;
-import org.example.bot.commands.HelpCommand;
-import org.example.bot.commands.RemoveDefaultChannel;
-import org.example.bot.commands.SearchYoutubeCommand;
+import org.example.bot.commands.*;
 import org.example.bot.handler.Responses;
 import org.example.bot.listeners.LoginListener;
 import org.example.bot.listeners.MessageListener;
@@ -31,9 +28,10 @@ public class Bot {
     // Path to "config.yml" configuration file
     private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
     private static String defaultChannelId = "";
+    private static String webHookUrl = "";
     // Discord bot token that is stored in "keys.yml"
     private static String token = "";
-    // YouTube's authorization token, to access video database. Google Cloud > YouTube Data v3 API
+    // YouTube's authorization token, to access a video database. Google Cloud > YouTube Data v3 API
     private static YoutubeAPI youtube = null;
     // JDA instance
     private static JDA jda = null;
@@ -69,6 +67,10 @@ public class Bot {
         return jda;
     }
 
+    public static String getToken() {
+        return token;
+    }
+
     public static YoutubeAPI getYoutube() {
         return youtube;
     }
@@ -77,8 +79,13 @@ public class Bot {
         return defaultChannelId;
     }
 
+    public static String getWebHookUrl() {
+        return webHookUrl;
+    }
+
     /**
      * Loads configuration and keys from files
+     *
      * @throws FileNotFoundException if config file does not exist
      */
     private static void loadInitialConfiguration() throws FileNotFoundException {
@@ -94,12 +101,42 @@ public class Bot {
         inputStream = new FileInputStream(configFilePath);
         data = yaml.load(inputStream);
         defaultChannelId = data.get("default-channel-id");
+        webHookUrl = data.get("webhook-url");
 
         initialiseYoutubeInstance(apiKey);
     }
 
     /**
+     * Saves configuration file
+     *
+     * @param value String, id that needs to be saved
+     * @param ch int, indicates, what needs to be save,
+     *           <br>0 - save defaultChannelId
+     *           <br>1 - save webHookUrl
+     *
+     * @throws FileNotFoundException if config file does not exist
+     */
+    public static void saveConfig(String value, int ch) throws FileNotFoundException {
+        switch (ch) {
+            case 0 -> defaultChannelId = value;
+            case 1 -> webHookUrl = value;
+            default -> {
+                return;
+            }
+        }
+
+        Map<String, String> data = new HashMap<>();
+        data.put("default-channel-id", defaultChannelId);
+        data.put("webhook-url", webHookUrl);
+
+        PrintWriter writer = new PrintWriter(configFilePath);
+        Yaml yaml = new Yaml();
+        yaml.dump(data, writer);
+    }
+
+    /**
      * Initializes YouTube instance to work with a video database
+     *
      * @param apiKey String, API key from Google Cloud Auth
      */
     private static void initialiseYoutubeInstance(String apiKey) {
@@ -112,23 +149,8 @@ public class Bot {
     }
 
     /**
-     * Saves configuration file
-     * @param id String, id that needs to be saved
-     * @throws FileNotFoundException if config file does not exist
-     */
-    public static void saveConfig(String id) throws FileNotFoundException {
-        defaultChannelId = id;
-
-        Map<String, String> data = new HashMap<>();
-        data.put("default-channel-id", defaultChannelId);
-
-        PrintWriter writer = new PrintWriter(configFilePath);
-        Yaml yaml = new Yaml();
-        yaml.dump(data, writer);
-    }
-
-    /**
      * Configures basic bot settings
+     *
      * @param builder JDABuilder, builder instance
      */
     private static void configureBasicSettings(JDABuilder builder) {
@@ -144,6 +166,7 @@ public class Bot {
 
     /**
      * Configures memory usage of a bot to get better performance
+     *
      * @param builder JDABuilder, builder instance
      */
     private static void configureMemoryUsage(JDABuilder builder) {
@@ -160,6 +183,7 @@ public class Bot {
 
     /**
      * Registers listeners bot uses
+     *
      * @param builder JDABuilder, builder instance
      */
     private static void registerListeners(JDABuilder builder) {
@@ -172,6 +196,7 @@ public class Bot {
         builder.addEventListeners(new ChangeDefaultChannelCommand());
         builder.addEventListeners(new RemoveDefaultChannel());
         builder.addEventListeners(new SearchYoutubeCommand());
+        builder.addEventListeners(new ChangeYoutubeSearchChannel());
     }
 
     /**
@@ -180,17 +205,20 @@ public class Bot {
     private static void registerCommands() {
         jda.updateCommands().addCommands(
                 Commands.slash("help", "List of all commands available, with / and !!"),
-                Commands.slash("changechannel", "Change a channel, where the BOT is operating.").
+                Commands.slash("changechannel", "Change a channel, where the !! commands are ran.").
                         addOption(OptionType.CHANNEL, "channel", "The new channel to operate in", true),
                 Commands.slash("removechannel", "Remove the default channel to use the BOT everywhere."),
                 Commands.slash("youtube", "Search for a youtube video")
                         .addOption(OptionType.STRING, "search", "What you want to search for", true)
-                        .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false)
+                        .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false),
+                Commands.slash("changesearchchannel", "Change a channel where you search for YouTube videos")
+                        .addOption(OptionType.STRING, "url", "Go to Create Webhook and paste a URL you were provided with", true)
         ).queue();
     }
 
     /**
      * Sends message to a discord channel
+     *
      * @param message Message, message content instance
      * @param content String, str message
      */

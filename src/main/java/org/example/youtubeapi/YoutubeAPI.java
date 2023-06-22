@@ -11,6 +11,7 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ResourceId;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
+import com.google.api.services.youtube.model.Thumbnail;
 
 import java.io.IOException;
 
@@ -73,6 +74,7 @@ public class YoutubeAPI {
      * @return String, 2-dimensional array, [numberOfVideosReturned][2]
      *                  arr[i][0] - title of a video
      *                  arr[i][1] - link to a video
+     *                  arr[i][2] - thumbnail url
      */
     private static String[][] getVideoItems(Iterator<SearchResult> iteratorSearchResults, int numberOfVideosReturned) {
         if (!iteratorSearchResults.hasNext()) {
@@ -80,55 +82,56 @@ public class YoutubeAPI {
             return null;
         }
 
-        String[][] videoItemsArray = new String[numberOfVideosReturned][2];
+        String[][] videoItemsArray = new String[numberOfVideosReturned][3];
 
         int i = 0;
         while (iteratorSearchResults.hasNext()) {
             SearchResult singleVideo = iteratorSearchResults.next();
             ResourceId rId = singleVideo.getId();
             String link = getYoutubeLink(rId.getVideoId());
-            String title = singleVideo.getSnippet().getTitle();
 
-            videoItemsArray[i][0] = title;
-            videoItemsArray[i][1] = link;
-            // Confirm that the result represents a video. Otherwise, the
-            // item will not contain a video ID.
-//            if (rId.getKind().equals("youtube#video")) {
-//                System.out.println(" Video " + link);
-//                System.out.println(" Title: " + singleVideo.getSnippet().getTitle());
-//                System.out.println("\n");
-//            }
+            String title = singleVideo.getSnippet().getTitle();
+            // Fix to discord showing Unicode Values instead of symbols
+            title = title.replace("&#39;", "'");
+            title = title.replace("&amp;", "&");
+            title = title.replace("&quot;", "\"");
+
+            Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
+            String thumbnailUrl = thumbnail.getUrl();
+
+
+            // Confirm that the result represents a video. Otherwise, the item will not contain a video ID.
+            if (rId.getKind().equals("youtube#video")) {
+                videoItemsArray[i][0] = title;
+                videoItemsArray[i][1] = link;
+                videoItemsArray[i][2] = thumbnailUrl;
+            }
             i++;
         }
         return videoItemsArray;
     }
-    /*
-    To get a thumbnail:
-    Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
-    System.out.println(" Thumbnail: " + thumbnail.getUrl());
-    To get a description:
-    System.out.println(" Desc: " + singleVideo.getSnippet().getDescription());
-    + add
-    search.setFields("items(id/kind,id/videoId,snippet/title,snippet/thumbnails/default/url,snippet/description)");
-     */
 
     /**
      * Creates a string containing a list of items to show to user
      * @param videos String[][], array with search result items
      * @return String, list of YouTube items to display
      */
-    public static String getSearchResultAsString(String[][] videos) {
-        StringBuilder str = new StringBuilder("Search results: \n");
-
-        for (int i = 0; i < videos.length; i++) {
-            str.append(i + 1)
-                    .append(": ")
-                    .append(videos[i][0])
-                    .append("\n");
-        }
-
-        return str.toString();
-    }
+//    public static String getSearchResultAsString(String[][] videos) {
+//        StringBuilder str = new StringBuilder("Search results: \n");
+//
+//        for (int i = 0; i < videos.length; i++) {
+//            str.append(i + 1)
+//                    .append(": ")
+//                    .append(videos[i][1])
+//                    .append("\n")
+//                    .append(videos[i][0])
+//                    .append("\n")
+//                    .append(videos[i][2])
+//                    .append("\n");
+//        }
+//
+//        return str.toString();
+//    }
 
     /**
      * Creates a full YouTube link from id
@@ -136,13 +139,8 @@ public class YoutubeAPI {
      * @return String, final link
      */
     private static String getYoutubeLink(String id) {
-        return "https://www.youtube.com/watch?v=" + id;
+        return "<https://www.youtube.com/watch?v=" + id + ">";
     }
-
-
-    // TODO:
-    //  1. Integrate YoutubeApi into bot to search videos,
-    //  4. Test non-required options
 }
 
 

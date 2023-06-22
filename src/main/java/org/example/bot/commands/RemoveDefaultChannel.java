@@ -13,7 +13,7 @@ public class RemoveDefaultChannel extends ListenerAdapter {
             return;
 
         try {
-            Bot.saveConfig("none");
+            Bot.saveConfig("none", 0);
         } catch (FileNotFoundException e) {
             System.out.println("Config file does not exist");
             event.reply("Config file does not exist").setEphemeral(false).queue();
