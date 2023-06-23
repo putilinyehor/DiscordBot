@@ -23,14 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Bot {
-    // Path to "keys.yml" configuration file
-    private static final String keysFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\keys.yml";
-    // Path to "config.yml" configuration file
-    private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
-    private static String defaultChannelId = "";
-    private static String webHookUrl = "";
-    // Discord bot token that is stored in "keys.yml"
-    private static String token = "";
     // YouTube's authorization token, to access a video database. Google Cloud > YouTube Data v3 API
     private static YoutubeAPI youtube = null;
     // JDA instance
@@ -41,7 +33,7 @@ public class Bot {
      */
     public Bot() {
         try {
-            loadInitialConfiguration();
+            Variables.loadInitialConfiguration();
         } catch (FileNotFoundException e) {
             System.out.println("Config file does not exist");
             System.exit(-1);
@@ -52,7 +44,7 @@ public class Bot {
      * Runs discord bot (1initialize JDA)
      */
     public void runBot() {
-        JDABuilder builder = JDABuilder.createDefault(token);
+        JDABuilder builder = JDABuilder.createDefault(Variables.token);
 
         configureBasicSettings(builder);
         configureMemoryUsage(builder);
@@ -68,7 +60,7 @@ public class Bot {
     }
 
     public static String getToken() {
-        return token;
+        return Variables.token;
     }
 
     public static YoutubeAPI getYoutube() {
@@ -76,62 +68,15 @@ public class Bot {
     }
 
     public static String getDefaultChannelId() {
-        return defaultChannelId;
+        return Variables.defaultChannelId;
     }
 
     public static String getWebHookUrl() {
-        return webHookUrl;
+        return Variables.webHookUrl;
     }
 
-    /**
-     * Loads configuration and keys from files
-     *
-     * @throws FileNotFoundException if config file does not exist
-     */
-    private static void loadInitialConfiguration() throws FileNotFoundException {
-        InputStream inputStream = null;
-        Yaml yaml = new Yaml();
-        Map<String, String> data;
-
-        inputStream = new FileInputStream(keysFilePath);
-        data = yaml.load(inputStream);
-        token = data.get("token");
-        String apiKey = data.get("api-key");
-
-        inputStream = new FileInputStream(configFilePath);
-        data = yaml.load(inputStream);
-        defaultChannelId = data.get("default-channel-id");
-        webHookUrl = data.get("webhook-url");
-
-        initialiseYoutubeInstance(apiKey);
-    }
-
-    /**
-     * Saves configuration file
-     *
-     * @param value String, id that needs to be saved
-     * @param ch int, indicates, what needs to be save,
-     *           <br>0 - save defaultChannelId
-     *           <br>1 - save webHookUrl
-     *
-     * @throws FileNotFoundException if config file does not exist
-     */
     public static void saveConfig(String value, int ch) throws FileNotFoundException {
-        switch (ch) {
-            case 0 -> defaultChannelId = value;
-            case 1 -> webHookUrl = value;
-            default -> {
-                return;
-            }
-        }
-
-        Map<String, String> data = new HashMap<>();
-        data.put("default-channel-id", defaultChannelId);
-        data.put("webhook-url", webHookUrl);
-
-        PrintWriter writer = new PrintWriter(configFilePath);
-        Yaml yaml = new Yaml();
-        yaml.dump(data, writer);
+        Variables.saveConfig(value, ch);
     }
 
     /**
@@ -233,5 +178,66 @@ public class Bot {
 
         MessageChannel channel = message.getChannel();
         channel.sendMessage(responseMessage).queue();
+    }
+
+    private static class Variables {
+        // Path to "keys.yml" configuration file
+        private static final String keysFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\keys.yml";
+        // Path to "config.yml" configuration file
+        private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
+        private static String defaultChannelId = "";
+        private static String webHookUrl = "";
+        // Discord bot token that is stored in "keys.yml"
+        private static String token = "";
+        /**
+         * Loads configuration and keys from files
+         *
+         * @throws FileNotFoundException if config file does not exist
+         */
+        private static void loadInitialConfiguration() throws FileNotFoundException {
+            InputStream inputStream = null;
+            Yaml yaml = new Yaml();
+            Map<String, String> data;
+
+            inputStream = new FileInputStream(keysFilePath);
+            data = yaml.load(inputStream);
+            token = data.get("token");
+            String apiKey = data.get("api-key");
+
+            inputStream = new FileInputStream(configFilePath);
+            data = yaml.load(inputStream);
+            defaultChannelId = data.get("default-channel-id");
+            webHookUrl = data.get("webhook-url");
+
+            initialiseYoutubeInstance(apiKey);
+        }
+
+        /**
+         * Saves configuration file
+         *
+         * @param value String, id that needs to be saved
+         * @param ch int, indicates, what needs to be save,
+         *           <br>0 - save defaultChannelId
+         *           <br>1 - save webHookUrl
+         *
+         * @throws FileNotFoundException if config file does not exist
+         */
+        public static void saveConfig(String value, int ch) throws FileNotFoundException {
+            switch (ch) {
+                case 0 -> defaultChannelId = value;
+                case 1 -> webHookUrl = value;
+                default -> {
+                    return;
+                }
+            }
+
+            Map<String, String> data = new HashMap<>();
+            data.put("default-channel-id", defaultChannelId);
+            data.put("webhook-url", webHookUrl);
+
+            PrintWriter writer = new PrintWriter(configFilePath);
+            Yaml yaml = new Yaml();
+            yaml.dump(data, writer);
+        }
     }
 }

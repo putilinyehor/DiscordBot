@@ -92,9 +92,10 @@ public class YoutubeAPI {
 
             String title = singleVideo.getSnippet().getTitle();
             // Fix to discord showing Unicode Values instead of symbols
-            title = title.replace("&#39;", "'");
-            title = title.replace("&amp;", "&");
-            title = title.replace("&quot;", "\"");
+            title = title
+                    .replace("&#39;", "'")
+                    .replace("&amp;", "&")
+                    .replace("&quot;", "\"");
 
             Thumbnail thumbnail = singleVideo.getSnippet().getThumbnails().getDefault();
             String thumbnailUrl = thumbnail.getUrl();
@@ -111,11 +112,6 @@ public class YoutubeAPI {
         return videoItemsArray;
     }
 
-    /**
-     * Creates a string containing a list of items to show to user
-     * @param videos String[][], array with search result items
-     * @return String, list of YouTube items to display
-     */
 //    public static String getSearchResultAsString(String[][] videos) {
 //        StringBuilder str = new StringBuilder("Search results: \n");
 //

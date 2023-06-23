@@ -13,12 +13,17 @@ public class SearchYoutubeCommand extends ListenerAdapter {
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if (!event.getName().equalsIgnoreCase("youtube"))
             return;
-        int numberOfVideosReturned = 5; // default number of videos to be returned
 
         String searchStr = Objects.requireNonNull(event.getOption("search")).getAsString();
+        int numberOfVideosReturned = 5; // default number of videos to be returned
         if (event.getOption("amount") != null)
             numberOfVideosReturned = Objects.requireNonNull(event.getOption("amount")).getAsInt();
+
         String[][] result = Bot.getYoutube().getSearchResult(searchStr, numberOfVideosReturned);
+        if (result == null) {
+            event.reply("No search results.").setEphemeral(false).queue();
+            return;
+        }
 
         WebHookClient webhook;
         try {
