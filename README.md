@@ -1,3 +1,3 @@
-This is a Discord Bot for a specific, unknown, mystery server. It is created to work on a very specific server so you can't use it really. But if you like, here's the source code.
+This is a Discord Bot for a specific, unknown, mystery server. It is created to work on one server, because it will disconnect and connect fairly often. Therefore it uses a save configuration function to be able to wake up and restore all the data that was used before
 __Don't have a good day.
 Have a great day.__
