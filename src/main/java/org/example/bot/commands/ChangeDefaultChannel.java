@@ -1,16 +1,20 @@
 package org.example.bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.example.bot.Bot;
+import org.example.bot.listeners.adapters.ExtendedListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.util.Objects;
 
-public class ChangeDefaultChannelCommand extends ListenerAdapter {
+/**
+ * Executes logic for /setchannel command
+ */
+public class ChangeDefaultChannel extends ExtendedListenerAdapter {
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals("changechannel"))
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        if (!isCommand(event, "setchannel"))
             return;
 
         String channelID = Objects.requireNonNull(event.getOption("channel")).getAsChannel().getId();

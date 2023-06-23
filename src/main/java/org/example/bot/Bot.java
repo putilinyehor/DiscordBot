@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.example.bot.commands.*;
-import org.example.bot.handler.Responses;
 import org.example.bot.listeners.LoginListener;
 import org.example.bot.listeners.MessageListener;
+import org.example.bot.listeners.ReactionListener;
 import org.example.youtubeapi.YoutubeAPI;
 import org.yaml.snakeyaml.Yaml;
 
@@ -75,6 +75,16 @@ public class Bot {
         return Variables.webHookUrl;
     }
 
+    /**
+     * Saves configuration file
+     *
+     * @param value String, id that needs to be saved
+     * @param ch int, indicates, what needs to be save,
+     *           <br>0 - save defaultChannelId
+     *           <br>1 - save webHookUrl
+     *
+     * @throws FileNotFoundException if config file does not exist
+     */
     public static void saveConfig(String value, int ch) throws FileNotFoundException {
         Variables.saveConfig(value, ch);
     }
@@ -103,7 +113,8 @@ public class Bot {
         builder.enableIntents(GatewayIntent.MESSAGE_CONTENT);
         // Disable parts of the cache
         builder.disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE);
-        // Enable the bulk delete event
+        // CacheFlag.VOICE_STATE enable to access memberVoiceState
+        // Enable the bulk deleted event
         builder.setBulkDeleteSplittingEnabled(false);
         // Set activity (like "playing Something")
         builder.setActivity(Activity.watching("after you from under your bed"));
@@ -135,12 +146,13 @@ public class Bot {
         // Listeners
         builder.addEventListeners(new LoginListener());
         builder.addEventListeners(new MessageListener());
+        builder.addEventListeners(new ReactionListener());
 
         // Slash Commands
-        builder.addEventListeners(new HelpCommand());
-        builder.addEventListeners(new ChangeDefaultChannelCommand());
+        builder.addEventListeners(new Help());
+        builder.addEventListeners(new ChangeDefaultChannel());
         builder.addEventListeners(new RemoveDefaultChannel());
-        builder.addEventListeners(new SearchYoutubeCommand());
+        builder.addEventListeners(new SearchYoutube());
         builder.addEventListeners(new ChangeYoutubeSearchChannel());
     }
 
@@ -150,36 +162,31 @@ public class Bot {
     private static void registerCommands() {
         jda.updateCommands().addCommands(
                 Commands.slash("help", "List of all commands available, with / and !!"),
-                Commands.slash("changechannel", "Change a channel, where the !! commands are ran.").
+                Commands.slash("setchannel", "Change a channel, where commands are ran.").
                         addOption(OptionType.CHANNEL, "channel", "The new channel to operate in", true),
-                Commands.slash("removechannel", "Remove the default channel to use the BOT everywhere."),
+                Commands.slash("removechannel", "Remove a channel, where bot operates to prevent access to all functions."),
                 Commands.slash("youtube", "Search for a youtube video")
                         .addOption(OptionType.STRING, "search", "What you want to search for", true)
                         .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false),
-                Commands.slash("changesearchchannel", "Change a channel where you search for YouTube videos")
+                Commands.slash("setwebhook", "Set a webhook to display information from YouTube and other portals")
                         .addOption(OptionType.STRING, "url", "Go to Create Webhook and paste a URL you were provided with", true)
         ).queue();
     }
 
     /**
-     * Sends message to a discord channel
+     * Sends message to a required channel using Message message
      *
-     * @param message Message, message content instance
-     * @param content String, str message
+     * @param message Message, an instance of a message that has been sent
+     * @param content String, content to be sent
      */
     public static void sendMessage(Message message, String content) {
-        if (content.length() < 2 || !content.substring(0, 2).equalsIgnoreCase("!!"))
-            return;
-
-        String responseMessage = Responses.handleResponse(message, content.substring(2));
-        if (responseMessage.equalsIgnoreCase("")) {
-            return;
-        }
-
-        MessageChannel channel = message.getChannel();
-        channel.sendMessage(responseMessage).queue();
+        TextChannel channel = message.getChannel().asTextChannel();
+        channel.sendMessage(content).queue();
     }
 
+    /**
+     * Contains all variables that the bot needs
+     */
     private static class Variables {
         // Path to "keys.yml" configuration file
         private static final String keysFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\keys.yml";
@@ -212,16 +219,6 @@ public class Bot {
             initialiseYoutubeInstance(apiKey);
         }
 
-        /**
-         * Saves configuration file
-         *
-         * @param value String, id that needs to be saved
-         * @param ch int, indicates, what needs to be save,
-         *           <br>0 - save defaultChannelId
-         *           <br>1 - save webHookUrl
-         *
-         * @throws FileNotFoundException if config file does not exist
-         */
         public static void saveConfig(String value, int ch) throws FileNotFoundException {
             switch (ch) {
                 case 0 -> defaultChannelId = value;

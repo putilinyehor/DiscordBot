@@ -135,7 +135,7 @@ public class YoutubeAPI {
      * @return String, final link
      */
     private static String getYoutubeLink(String id) {
-        return "<https://www.youtube.com/watch?v=" + id + ">";
+        return "https://www.youtube.com/watch?v=" + id;
     }
 }
 

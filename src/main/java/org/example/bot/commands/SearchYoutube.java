@@ -1,18 +1,25 @@
 package org.example.bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.example.bot.Bot;
+import org.example.bot.listeners.adapters.ExtendedListenerAdapter;
 import org.example.bot.webhook.WebHookClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class SearchYoutubeCommand extends ListenerAdapter {
+/**
+ * Executes logic for /youtube command
+ */
+public class SearchYoutube extends ExtendedListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (!event.getName().equalsIgnoreCase("youtube"))
+        if (!isCommand(event, "youtube"))
             return;
+
+        if (!isUserAllowedToExecuteCommand(event)) {
+            return;
+        }
 
         String searchStr = Objects.requireNonNull(event.getOption("search")).getAsString();
         int numberOfVideosReturned = 5; // default number of videos to be returned
@@ -34,8 +41,8 @@ public class SearchYoutubeCommand extends ListenerAdapter {
             return;
         }
 
-        event.reply("Search results (Please wait until they all load fully)").setEphemeral(false).queue();
-        webhook = new WebHookClient();
+        event.reply("Search results (Wait until everything will load) :").setEphemeral(false).queue();
         webhook.displayYoutubeVideosList(result);
+        webhook.close();
     }
 }

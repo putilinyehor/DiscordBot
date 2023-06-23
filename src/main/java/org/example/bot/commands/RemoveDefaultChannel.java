@@ -1,15 +1,19 @@
 package org.example.bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.example.bot.Bot;
+import org.example.bot.listeners.adapters.ExtendedListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 
-public class RemoveDefaultChannel extends ListenerAdapter {
+/**
+ * Executes logic for /removechannel command
+ */
+public class RemoveDefaultChannel extends ExtendedListenerAdapter {
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        if (!event.getName().equalsIgnoreCase("removechannel"))
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
+        if (!isCommand(event, "removechannel"))
             return;
 
         try {

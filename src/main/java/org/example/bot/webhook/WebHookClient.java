@@ -25,6 +25,10 @@ public class WebHookClient {
         this.client = builder.build();
     }
 
+    public void close() {
+        this.client.close();
+    }
+
     /**
      * Displays a list of YouTube videos to user as Embeds
      *
@@ -32,7 +36,7 @@ public class WebHookClient {
      */
     public void displayYoutubeVideosList(String[][] videos) {
         // initializing embed view to display YouTube videos
-        WebhookEmbed embed = null;
+        WebhookEmbed embed;
 
         for (String[] video : videos) {
             embed = new WebhookEmbedBuilder()

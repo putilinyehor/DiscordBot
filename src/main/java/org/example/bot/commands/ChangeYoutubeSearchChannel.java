@@ -1,18 +1,25 @@
 package org.example.bot.commands;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.example.bot.Bot;
+import org.example.bot.listeners.adapters.ExtendedListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.util.Objects;
 
-public class ChangeYoutubeSearchChannel extends ListenerAdapter {
+/**
+ * Executes logic for /setwebhook command
+ */
+public class ChangeYoutubeSearchChannel extends ExtendedListenerAdapter {
     @Override
     public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
-        if (!event.getName().equalsIgnoreCase("changesearchchannel"))
+        if (!isCommand(event, "setwebhook"))
             return;
+
+        if (!isUserAllowedToExecuteCommand(event))
+            return;
+
 
         String url = Objects.requireNonNull(event.getOption("url")).getAsString();
         String channelName = event.getChannel().getName();

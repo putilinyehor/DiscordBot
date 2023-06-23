@@ -2,7 +2,7 @@ package org.example.bot.handler;
 
 import net.dv8tion.jda.api.entities.Message;
 
-public class Responses {
+public class CommandResponse {
     /**
      * Handles message string to execute the right command
      *
