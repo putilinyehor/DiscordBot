@@ -23,12 +23,11 @@ public class Help extends ExtendedListenerAdapter {
                             /removechannel - remove default channel, BOT will be available anywhere
                             
                             Can run after setting default channel with /setchannel
-                            /setwebhook - as you can search for youtube videos only in one channel, this command is used to set WebHook to display information from YouTube etc. Note that WebHook should be set in the channel, that you've already set with /setchannel command
-                                    url             url of a webhook that you have created for a required channel
                             /youtube - search for a YouTube video.
-                            IF ONLY "Search results (Wait until everything will load) :" is displayed, then create a webhook and run /setwebhook first
                                     search          search input
                                     amount          how many videos do you want to display
+                                    Features:
+                                        react to a video you want to watch with :regional_indicator_v: to re-send it to the channel as a link
                            
                             --------
                             Requests

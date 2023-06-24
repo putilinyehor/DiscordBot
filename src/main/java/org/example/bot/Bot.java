@@ -71,10 +71,6 @@ public class Bot {
         return Variables.defaultChannelId;
     }
 
-    public static String getWebHookUrl() {
-        return Variables.webHookUrl;
-    }
-
     /**
      * Saves configuration file
      *
@@ -153,7 +149,6 @@ public class Bot {
         builder.addEventListeners(new ChangeDefaultChannel());
         builder.addEventListeners(new RemoveDefaultChannel());
         builder.addEventListeners(new SearchYoutube());
-        builder.addEventListeners(new ChangeYoutubeSearchChannel());
     }
 
     /**
@@ -167,9 +162,7 @@ public class Bot {
                 Commands.slash("removechannel", "Remove a channel, where bot operates to prevent access to all functions."),
                 Commands.slash("youtube", "Search for a youtube video")
                         .addOption(OptionType.STRING, "search", "What you want to search for", true)
-                        .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false),
-                Commands.slash("setwebhook", "Set a webhook to display information from YouTube and other portals")
-                        .addOption(OptionType.STRING, "url", "Go to Create Webhook and paste a URL you were provided with", true)
+                        .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false)
         ).queue();
     }
 
@@ -193,8 +186,6 @@ public class Bot {
         // Path to "config.yml" configuration file
         private static final String configFilePath = System.getProperty("user.dir") + "\\src\\main\\java\\org\\example\\configuration\\config.yml";
         private static String defaultChannelId = "";
-        private static String webHookUrl = "";
-        // Discord bot token that is stored in "keys.yml"
         private static String token = "";
         /**
          * Loads configuration and keys from files
@@ -214,15 +205,13 @@ public class Bot {
             inputStream = new FileInputStream(configFilePath);
             data = yaml.load(inputStream);
             defaultChannelId = data.get("default-channel-id");
-            webHookUrl = data.get("webhook-url");
 
             initialiseYoutubeInstance(apiKey);
         }
 
         public static void saveConfig(String value, int ch) throws FileNotFoundException {
-            switch (ch) {
+            switch (ch) { // switch in case there will be new choices in the future
                 case 0 -> defaultChannelId = value;
-                case 1 -> webHookUrl = value;
                 default -> {
                     return;
                 }
@@ -230,7 +219,6 @@ public class Bot {
 
             Map<String, String> data = new HashMap<>();
             data.put("default-channel-id", defaultChannelId);
-            data.put("webhook-url", webHookUrl);
 
             PrintWriter writer = new PrintWriter(configFilePath);
             Yaml yaml = new Yaml();

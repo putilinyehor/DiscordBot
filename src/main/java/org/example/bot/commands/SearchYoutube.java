@@ -1,9 +1,9 @@
 package org.example.bot.commands;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.example.bot.Bot;
 import org.example.bot.listeners.adapters.ExtendedListenerAdapter;
-import org.example.bot.webhook.WebHookClient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -32,17 +32,28 @@ public class SearchYoutube extends ExtendedListenerAdapter {
             return;
         }
 
-        WebHookClient webhook;
-        try {
-            webhook = new WebHookClient();
-        } catch (Exception e) {
-            event.reply("Something went wrong while trying to display youtube videos. \n" +
-                    "Try to run /changesearchchannel command to reset search channel.").setEphemeral(false).queue();
-            return;
-        }
-
         event.reply("Search results (Wait until everything will load) :").setEphemeral(false).queue();
-        webhook.displayYoutubeVideosList(result);
-        webhook.close();
+        displayYoutubeVideosList(event, result);
+
+    }
+
+    /**
+     * Displays a list of YouTube videos to user as Embeds
+     *
+     * @param videos String[][], list of YouTube videos to be displayed
+     */
+    public void displayYoutubeVideosList(SlashCommandInteractionEvent event, String[][] videos) {
+        // initializing embed builder to display YouTube videos
+        EmbedBuilder embedBuilder;
+
+        for (String[] video : videos) {
+            embedBuilder = new EmbedBuilder()
+                    .setTitle(video[0])
+                    .setDescription(video[1])
+                    .setImage(video[2])
+                    .setColor(0xFF00EE);
+
+            event.getChannel().asTextChannel().sendMessage("").setEmbeds(embedBuilder.build()).queue();
+        }
     }
 }
