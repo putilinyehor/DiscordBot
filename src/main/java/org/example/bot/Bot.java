@@ -149,6 +149,7 @@ public class Bot {
         builder.addEventListeners(new ChangeDefaultChannel());
         builder.addEventListeners(new RemoveDefaultChannel());
         builder.addEventListeners(new SearchYoutube());
+        builder.addEventListeners(new SearchBuild());
     }
 
     /**
@@ -162,6 +163,9 @@ public class Bot {
                 Commands.slash("removechannel", "Remove a channel, where bot operates to prevent access to all functions."),
                 Commands.slash("youtube", "Search for a youtube video")
                         .addOption(OptionType.STRING, "search", "What you want to search for", true)
+                        .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false),
+                Commands.slash("build", "Search for a champion build on Mobafire.com")
+                        .addOption(OptionType.STRING, "champion", "Champion you want to search for", true)
                         .addOption(OptionType.INTEGER, "amount", "Set how many results you want to have, 5 if not specified", false)
         ).queue();
     }

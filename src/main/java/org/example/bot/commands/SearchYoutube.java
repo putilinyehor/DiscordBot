@@ -23,12 +23,12 @@ public class SearchYoutube extends ExtendedListenerAdapter {
 
         event.deferReply().setEphemeral(false).queue();
 
-        String searchStr = Objects.requireNonNull(event.getOption("search")).getAsString();
+        String search = Objects.requireNonNull(event.getOption("search")).getAsString();
         int numberOfVideosReturned = 5; // default number of videos to be returned
         if (event.getOption("amount") != null)
             numberOfVideosReturned = Objects.requireNonNull(event.getOption("amount")).getAsInt();
 
-        String[][] result = Bot.getYoutube().getSearchResult(searchStr, numberOfVideosReturned);
+        String[][] result = Bot.getYoutube().getSearchResult(search, numberOfVideosReturned);
         if (result == null) {
             event.getHook().editOriginal("No search results.").queue();
             return;
@@ -51,7 +51,7 @@ public class SearchYoutube extends ExtendedListenerAdapter {
         for (String[] video : videos) {
             embedBuilder = new EmbedBuilder()
                     .setTitle(video[0])
-                    .setDescription(video[1])
+                    .setFooter(video[1])
                     .setImage(video[2])
                     .setColor(0xFF00EE);
 

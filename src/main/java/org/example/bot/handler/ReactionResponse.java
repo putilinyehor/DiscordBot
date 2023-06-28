@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.example.bot.Bot;
 
+import java.util.Objects;
+
 
 public class ReactionResponse {
     /**
@@ -23,8 +25,14 @@ public class ReactionResponse {
         switch (emoji.getFormatted()) {
 //            case "\uD83C\uDDF5" ->  // P
 //                Bot.sendMessage(message, "+play " + embed.getDescription());
-            case "\uD83C\uDDFB" ->  // V
-                    Bot.sendMessage(message, embed.getDescription());
+            case "\uD83C\uDDFB" -> { // V
+                if (Objects.requireNonNull(Objects.requireNonNull(embed.getFooter()).getText()).contains("youtube"))
+                    Bot.sendMessage(message, Objects.requireNonNull(embed.getFooter()).getText());
+
+                if (embed.getFooter().getText().contains("mobafire"))
+                    Bot.sendMessage(message, "Got it");
+
+            }
             default -> {}
         }
 
