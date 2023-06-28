@@ -179,6 +179,11 @@ public class MobafireWebsiteParser {
         private final String url;
         private final Document doc;
 
+        /**
+         * Creates everything to retrieve information from build page
+         *
+         * @param url String, page url
+         */
         public BuildParser(String url) {
             this.url = url;
             try {
@@ -188,6 +193,11 @@ public class MobafireWebsiteParser {
             }
         }
 
+        /**
+         * Gets core items that are listed as a List
+         *
+         * @return coreItems List<String>, returns a List with items
+         */
         public List<String> getCoreItems() {
             List<String> coreItems = new ArrayList<>();
 
