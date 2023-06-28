@@ -21,5 +21,6 @@ public class Main2 {
             System.out.println(el.select("img").attr("alt"));
         }
         // TODO: save in file
+        //
     }
 }
