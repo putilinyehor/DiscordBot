@@ -17,6 +17,8 @@ public class ChangeDefaultChannel extends ExtendedListenerAdapter {
         if (!isCommand(event, "setchannel"))
             return;
 
+        event.deferReply().setEphemeral(false).queue();
+
         String channelID = Objects.requireNonNull(event.getOption("channel")).getAsChannel().getId();
         String channelName = Objects.requireNonNull(event.getOption("channel")).getAsChannel().getName();
 
@@ -24,10 +26,10 @@ public class ChangeDefaultChannel extends ExtendedListenerAdapter {
             Bot.saveConfig(channelID, 0);
         } catch (FileNotFoundException e) {
             System.out.println("Config file does not exist");
-            event.reply("Config file does not exist").setEphemeral(false).queue();
+            event.getHook().editOriginal("Config file does not exist").queue();
             return;
         }
-        event.reply("Now you can use the BOT only in \"" + channelName + "\"!").setEphemeral(false)
+        event.getHook().editOriginal("Now you can use the BOT only in \"" + channelName + "\"!")
                 .queue();
     }
 }

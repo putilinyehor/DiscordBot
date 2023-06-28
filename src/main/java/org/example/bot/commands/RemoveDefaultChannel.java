@@ -16,13 +16,15 @@ public class RemoveDefaultChannel extends ExtendedListenerAdapter {
         if (!isCommand(event, "removechannel"))
             return;
 
+        event.deferReply().setEphemeral(false).queue();
+
         try {
             Bot.saveConfig("none", 0);
         } catch (FileNotFoundException e) {
             System.out.println("Config file does not exist");
-            event.reply("Config file does not exist").setEphemeral(false).queue();
+            event.getHook().editOriginal("Config file does not exist").queue();
             return;
         }
-        event.reply("Successfully removed default channel. Now you can use the BOT anywhere!").setEphemeral(false).queue();
+        event.getHook().editOriginal("Successfully removed default channel. Now you can use the BOT anywhere!").queue();
     }
 }
