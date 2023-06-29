@@ -43,6 +43,3 @@ Maven Dependencies used:
             <version>1.16.1</version>
 </dependency>
 ```
-
-__Don't have a good day.
-Have a great day.__
