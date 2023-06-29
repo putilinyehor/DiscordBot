@@ -1,4 +1,4 @@
-package org.example.parsers;
+package org.example.parsers.mobafire;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class MobafireWebsiteParser {
+public class BuildsParser {
     private static final String baseSearchUrl = "https://www.mobafire.com/league-of-legends/champion/";
     private static final String baseUrl = "https://www.mobafire.com";
     private final String championUrl;
@@ -22,7 +22,7 @@ public class MobafireWebsiteParser {
      *
      * @throws IllegalArgumentException if a non-existing champion was passed
      */
-    public MobafireWebsiteParser(String champion) {
+    public BuildsParser(String champion) {
         if (getChampionUrl(champion).equalsIgnoreCase(""))
             throw new IllegalArgumentException("You entered a wrong champion name");
 
@@ -71,12 +71,12 @@ public class MobafireWebsiteParser {
      *
      * @param numberOfBuilds int, number of builds to display
      * @return String[][], if less than given amount - return empty
-     *                      0 - title
-     *                      1 - link
-     *                      2 - img
-     *                      3 - rating
-     *                      4 - likes
-     *                      5 - dislikes
+     *                      <br>0 - title
+     *                      <br>1 - link
+     *                      <br>2 - img
+     *                      <br>3 - rating
+     *                      <br>4 - likes
+     *                      <br>5 - dislikes
      */
     public String[][] getChampionBuildsInformation(int numberOfBuilds) {
         Document doc;
@@ -173,51 +173,5 @@ public class MobafireWebsiteParser {
             }
         }
         return "";
-    }
-
-    public static class BuildParser {
-        private final String url;
-        private final Document doc;
-
-        /**
-         * Creates everything to retrieve information from build page
-         *
-         * @param url String, page url
-         */
-        public BuildParser(String url) {
-            this.url = url;
-            try {
-                this.doc = Jsoup.connect(this.url).get();
-            } catch (IOException e) {
-                throw new RuntimeException("Something went wrong accessing the site");
-            }
-        }
-
-        /**
-         * Gets core items that are listed as a List
-         *
-         * @return coreItems List<String>, returns a List with items
-         */
-        public List<String> getCoreItems() {
-            List<String> coreItems = new ArrayList<>();
-
-            Elements items = this.doc.select("div.view-guide__build__core__inner").select("a");
-            for (Element el : items) {
-                System.out.println(getItemName(el.attr("href")));
-            }
-
-            return coreItems;
-        }
-
-        private String getItemName(String url) {
-            Document docItem;
-            try {
-                docItem = Jsoup.connect(baseUrl + url).get();
-            } catch (IOException e) {
-                throw new RuntimeException("Something went wrong accessing the site");
-            }
-            return Objects.requireNonNull(docItem.select("div.mf-responsive__leftCol").select("span").first()).text();
-            // TODO: get items from file, not from website and compare time spent
-        }
     }
 }

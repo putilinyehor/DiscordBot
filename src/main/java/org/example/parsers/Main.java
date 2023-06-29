@@ -1,13 +1,17 @@
 package org.example.parsers;
 
+import org.example.parsers.mobafire.BuildParser;
+import org.example.parsers.mobafire.BuildsParser;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
-        MobafireWebsiteParser mwp = null;
+        BuildsParser mwp = null;
         try {
-            mwp = new MobafireWebsiteParser("yone");
+            mwp = new BuildsParser("yone");
         } catch (IllegalArgumentException e) {
             System.out.println("Champion doesn't exist, pls enter again");
         }
@@ -18,17 +22,17 @@ public class Main {
             System.exit(-1);
         }
 
-        MobafireWebsiteParser.BuildParser pb = new MobafireWebsiteParser.BuildParser("https://www.mobafire.com/league-of-legends/build/yone-builds-handygamer-13-11-614460");
-        List<String> str = pb.getCoreItems();
-        System.out.println(str);
+        BuildParser pb = new BuildParser("https://www.mobafire.com/league-of-legends/build/s13-surfs-up-master-taric-support-guide-498036");
+        List<String> coreItems = pb.getCoreItems();
+        String[] runes = pb.getRunes();
+        String[] spells = pb.getSpells();
+        List<List<String>> items = pb.getItems();
 
-//        for (String[] str : builds) {
-//            if (mwp.isEmpty(str))
-//                continue;
-//            System.out.println("Rating:" + str[0]);
-//            System.out.println("Title:" + str[1]);
-//            System.out.println("Link:" + str[2]);
-//            System.out.println("Image:" + str[3]);
-//        }
+        System.out.println(coreItems);
+        System.out.println(Arrays.toString(runes));
+        System.out.println(Arrays.toString(spells));
+        for (List<String> row : items) {
+            System.out.println(row);
+        }
     }
 }

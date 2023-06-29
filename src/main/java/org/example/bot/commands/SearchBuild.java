@@ -3,7 +3,7 @@ package org.example.bot.commands;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.example.bot.listeners.adapters.ExtendedListenerAdapter;
-import org.example.parsers.MobafireWebsiteParser;
+import org.example.parsers.mobafire.BuildsParser;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -30,9 +30,9 @@ public class SearchBuild extends ExtendedListenerAdapter {
         }
 
 
-        MobafireWebsiteParser mwp;
+        BuildsParser mwp;
         try {
-            mwp = new MobafireWebsiteParser(champion);
+            mwp = new BuildsParser(champion);
         } catch (IllegalArgumentException e) {
             event.getHook().editOriginal("No search results, wrong champion name").queue();
             return;
@@ -53,7 +53,7 @@ public class SearchBuild extends ExtendedListenerAdapter {
         EmbedBuilder embedBuilder;
 
         for (String[] el : builds) {
-            if (MobafireWebsiteParser.isEmpty(el))
+            if (BuildsParser.isEmpty(el))
                 continue;
 
             embedBuilder = new EmbedBuilder()
