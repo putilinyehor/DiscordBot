@@ -1,10 +1,15 @@
 package org.example.bot.handler;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.emoji.UnicodeEmoji;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.example.bot.Bot;
+import org.example.parsers.mobafire.BuildParser;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -30,33 +35,95 @@ public class ReactionResponse {
                     Bot.sendMessage(message, Objects.requireNonNull(embed.getFooter()).getText());
 
                 if (embed.getFooter().getText().contains("mobafire"))
-                    Bot.sendMessage(message, "Got it");
+                    displayChampionBuild(event, embed.getFooter().getText());
 
             }
             default -> {}
         }
-
     }
 
-    /*
-      An example of trying to connect to VC to run other bot. Unfortunately, it was not possible but I won't delete it
-     */
-//    public static void connectToVC(Message message, MessageReactionAddEvent event, String link) {
-//        Member member = event.getMember();
-//        assert member != null : "Member instance is null, cannot retrieve who sent the message";
-//
-//        VoiceChannel channel = null;
-//        if (Objects.requireNonNull(member.getVoiceState()).getChannel() == null) {
-//            Bot.sendMessage(message, "You need to connect to VC first.");
-//            return;
-//        }
-//
-//        channel = member.getVoiceState().getChannel().asVoiceChannel();
-//        AudioManager audioManager = event.getGuild().getAudioManager();
-//        audioManager.openAudioConnection(channel);
-//
-//        Bot.sendMessage(message, "+play " + link);
-//
-//        audioManager.closeAudioConnection();
-//    }
+    private static void displayChampionBuild(MessageReactionAddEvent event, String link) {
+        BuildParser parser;
+        try {
+            parser = new BuildParser(link);
+        } catch (IOException e) {
+            event.getChannel().asTextChannel().sendMessage("Sorry, cannot display this build").queue();
+            return;
+        }
+
+        // Temporary used variables
+        StringBuilder str = new StringBuilder();
+        EmbedBuilder builder;
+
+        // -------- Core items embed ---------
+        List<String> coreItems = parser.getCoreItems();
+        for (int i = 1; i < coreItems.size(); i++)
+            str.append(coreItems.get(i)).append("\n");
+
+        builder = new EmbedBuilder()
+                .setTitle("Core items")
+                .addField("", str.toString(), false);
+        event.getChannel().asTextChannel().sendMessage("").setEmbeds(builder.build()).queue();
+
+        // -------- Runes embed ---------
+        String[] runes = parser.getRunes();
+
+        str = new StringBuilder()
+                .append(runes[1])
+                .append("\n")
+                .append(runes[2])
+                .append("\n")
+                .append(runes[3])
+                .append("\n")
+                .append(runes[4])
+                .append("\n");
+        builder = new EmbedBuilder()
+                        .setTitle("Runes:")
+                        .addField(runes[0], str.toString(), false);
+
+        str = new StringBuilder()
+                .append(runes[6])
+                .append("\n")
+                .append(runes[7])
+                .append("\n");
+        builder.addField(runes[5], str.toString(), false);
+
+        str = new StringBuilder()
+                .append(runes[8])
+                .append("\n")
+                .append(runes[9])
+                .append("\n")
+                .append(runes[10])
+                .append("\n");
+        builder.addField("Shards:", str.toString(), false)
+            .addBlankField(false);
+
+        event.getChannel().asTextChannel().sendMessage("").setEmbeds(builder.build()).queue();
+
+        // -------- Spells embed ---------
+        String[] spells = parser.getSpells();
+        builder = new EmbedBuilder()
+                .setTitle("Spells:")
+                .addField("", spells[0] + "\n" + spells[1], false);
+        event.getChannel().asTextChannel().sendMessage("").setEmbeds(builder.build()).queue();
+
+        // -------- Items embed ---------
+        List<List<String>> items = parser.getItems();
+
+        for (List<String> row : items) {
+            str = new StringBuilder();
+            builder = new EmbedBuilder();
+            builder.setTitle(row.get(0));
+
+            for (int i = 1; i < row.size() - 1; i++)
+                str.append(row.get(i))
+                        .append("\n");
+
+            builder.addField("", str.toString(), false);
+            if (!row.get(row.size() - 1).equalsIgnoreCase(""))
+                builder.addField("Notes:", row.get(row.size() - 1), false);
+
+            event.getChannel().asTextChannel().sendMessage("").setEmbeds(builder.build()).queue();
+        }
+    }
 }

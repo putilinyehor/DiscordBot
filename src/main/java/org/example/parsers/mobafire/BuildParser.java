@@ -17,12 +17,13 @@ public class BuildParser {
      * Creates everything to retrieve information from build page
      *
      * @param url String, page url
+     * @throws IOException if the url is non-existent
      */
-    public BuildParser(String url) {
+    public BuildParser(String url) throws IOException {
         try {
             this.doc = Jsoup.connect(url).get();
         } catch (IOException e) {
-            throw new RuntimeException("Something went wrong accessing the site");
+            throw new IOException("Something went wrong accessing the site");
         }
     }
 
@@ -53,7 +54,7 @@ public class BuildParser {
      */
     public String[] getRunes() {
         String[] runesArr = new String[11];
-        Elements runes = doc.select("div.new-runes__item");
+        Elements runes = this.doc.select("div.new-runes__item");
 
         runesArr[0] = Objects.requireNonNull(doc.select("div.new-runes__title").get(0)).text();
         runesArr[1] = runes.get(1).text();
@@ -79,7 +80,7 @@ public class BuildParser {
      */
     public String[] getSpells() {
         String[] spellsArr = new String[2];
-        Elements spells = doc.select("div.view-guide__spells__row").select("h4");
+        Elements spells = this.doc.select("div.view-guide__spells__row").select("h4");
 
         spellsArr[0] = spells.get(0).text();
         spellsArr[1] = spells.get(1).text();
@@ -96,7 +97,7 @@ public class BuildParser {
      */
     public List<List<String>> getItems() {
         List<List<String>> items = new ArrayList<>();
-        Elements itemsEl = doc.select("div.view-guide__items");
+        Elements itemsEl = this.doc.select("div.view-guide__items");
         Elements temp;
 
         int i = 0;
@@ -119,5 +120,28 @@ public class BuildParser {
         }
 
         return items;
+    }
+
+    /**
+     * Gets a list of threats
+     *
+     * @return List<String[]>, List with threats
+     */
+    public List<String[]> getThreats() {
+        List<String[]> threatsList = new ArrayList<>();
+        Elements threats = this.doc.select("div.view-guide__tS__bot__left").select("div.row");
+
+        int i = 0;
+        for (Element threat : threats) {
+            threatsList.add(new String[2]);
+
+            threatsList.get(i)[0] = threat.select("h4").text();
+            threatsList.get(i)[1] = threat.select("label").text();
+//            threatsList.get(i)[2] = threat.select("p").text();
+
+            i++;
+        }
+
+        return threatsList;
     }
 }
