@@ -28,7 +28,12 @@ public class Help extends ExtendedListenerAdapter {
                                     amount          how many videos do you want to display
                                     Features:
                                         react to a video you want to watch with :regional_indicator_v: to re-send it to the channel as a link
-                           
+                            /build - search for a build from "mobafire.com"
+                                    champion        champion you want to search
+                                    amount          amount of builds you want to display
+                                    Features:
+                                        - react to a build you want to display with :regional_indicator_v:
+                                        - react to an item list with :regional_indicator_v: to view extended item viewer
                             --------
                             Requests
                             !!ping - bot should respond with Pong! if he is online and working
