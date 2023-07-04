@@ -50,7 +50,6 @@ public class ReactionResponse {
                     }
                     if (embed.getFields().size() == 3) {
                         displayRunesExtended(event, embed);
-                        return;
                     }
                 }
             }
@@ -59,6 +58,12 @@ public class ReactionResponse {
         }
     }
 
+    /**
+     * Display build information, received by parser
+     *
+     * @param event MessageReactionAddEvent, event instance
+     * @param link String, url of the build
+     */
     private static void displayChampionBuild(MessageReactionAddEvent event, String link) {
         BuildParser parser;
         try {
@@ -143,6 +148,12 @@ public class ReactionResponse {
         }
     }
 
+    /**
+     * Display a series of items with their images, received by parser
+     *
+     * @param event MessageReactionAddEvent, event instance
+     * @param embed MessageEmbed, original embed, from which the information is received
+     */
     private static void displayItemsExtended(MessageReactionAddEvent event, MessageEmbed embed) {
         String items = embed.getFields().get(0).getValue();
         String[] separatedItemNames = Objects.requireNonNull(items).split("\n");
@@ -169,6 +180,12 @@ public class ReactionResponse {
         }
     }
 
+    /**
+     * Display a series of runes with their images, received by parser
+     *
+     * @param event MessageReactionAddEvent, event instance
+     * @param embed MessageEmbed, original embed, from which the information is received
+     */
     private static void displayRunesExtended(MessageReactionAddEvent event, MessageEmbed embed) {
         String items =
                 embed.getFields().get(0).getValue() + "\n" +

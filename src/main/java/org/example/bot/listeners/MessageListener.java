@@ -40,7 +40,7 @@ public class MessageListener extends ExtendedListenerAdapter {
         if (content.length() < 2 || !content.substring(0, 2).equalsIgnoreCase("!!"))
             return;
 
-        String responseMessage = CommandResponse.handleResponse(message, content.substring(2));
+        String responseMessage = CommandResponse.handleResponse(content.substring(2));
         if (responseMessage.equalsIgnoreCase("")) {
             return;
         }
