@@ -1,6 +1,6 @@
 Discord bot example. 
-__Check out /help command to see commands available__
-What this bot can: 
+<br>__Check out /help command to see commands available__
+<br>What this bot can: 
 * search youtube videos
 * display Champion Builds from the game League of Legends.
 _NOTE_
