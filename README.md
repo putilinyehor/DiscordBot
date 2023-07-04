@@ -1,9 +1,16 @@
-This is a Discord Bot for a specific, unknown, mystery server. It is created to work on one server, because it will disconnect and connect fairly often. Therefore it uses a save configuration function to be able to wake up and restore all the data that was used before. This can serve as an example of using different functions of JDA.
+Discord bot example. 
+__Check out /help command to see commands available__
+What this bot can: 
+* search youtube videos
+* display Champion Builds from the game League of Legends.
+_NOTE_
+This bot is intended to be used only on one server from a working machine. Therefore it saves the chat, where all the commands should be ran, to optimize the working process. 
 
 Recources used:
 <br>https://developers.google.com/youtube/v3
 <br>https://github.com/discord-jda/JDA
 <br>https://jda.wiki/introduction/jda/
+<br>https://jsoup.org
 
 Maven Dependencies used:
 ```
